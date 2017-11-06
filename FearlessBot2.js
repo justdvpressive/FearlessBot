@@ -376,6 +376,12 @@ function updateUserStats(message)
             "ON DUPLICATE KEY UPDATE username=?, discriminator=?, lastseen=UNIX_TIMESTAMP(), words=words+?, messages=messages+1, active=1",
             [message.channel.guild.id, message.author.id, message.author.username, message.author.discriminator,
                  words, message.author.username, message.author.discriminator, words]);
+        let today = new Date();
+        if (today.getDate() === 6) {
+            db.query("UPDATE members SET lorpoints=lorpoints+1, eventpoints=eventpoints+1, lastpoint=UNIX_TIMESTAMP() WHERE server = ? AND id = ? AND eventpoints < 5 AND lastpoint < UNIX_TIMESTAMP() - 600",
+                [message.channel.guild.id, message.author.id]);
+        }
+
     } else {
         db.query("INSERT INTO members (server, id, username, discriminator, lastseen) VALUES (?,?,?,?,UNIX_TIMESTAMP())" +
             "ON DUPLICATE KEY UPDATE username=?, discriminator=?, lastseen=UNIX_TIMESTAMP(), active=1",
@@ -779,9 +785,13 @@ function lorpointsCommand(message, params)
         member = message.author.username;
     }
 
-    db.query("SELECT username, lorpoints FROM members WHERE server = ? AND username = ?", [message.channel.guild.id, member], function (err,rows) {
+    db.query("SELECT username, lorpoints, eventpoints FROM members WHERE server = ? AND username = ?", [message.channel.guild.id, member], function (err,rows) {
         if (rows[0] !== null) {
-            message.reply(rows[0].username + " has " + rows[0].lorpoints + ' lorpoints.');
+            let event='';
+            if (rows[0].eventpoints > 0) {
+                event=', including ' + rows[0].eventpoints + ' for Monday\'s event.';
+            }
+            message.reply(rows[0].username + " has " + rows[0].lorpoints + ' lorpoints' + event);
         }
     });
 }
