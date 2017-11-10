@@ -16,6 +16,7 @@ var db = mysql.createConnection({
 bot.on('ready', () => {
     console.log('FearlessBot2 is ready.');
     setInterval(runScheduledActions, 60000);
+    setInterval(reputationLorpoints, 60000);
     setInterval(logModStats, 900000);
 });
 
@@ -382,6 +383,25 @@ function updateUserStats(message)
             "ON DUPLICATE KEY UPDATE username=?, discriminator=?, lastseen=UNIX_TIMESTAMP(), words=words+?, messages=messages+1, active=1",
             [message.channel.guild.id, message.author.id, message.author.username, message.author.discriminator,
                  words, message.author.username, message.author.discriminator, words]);
+
+        if (message.content.includes("#reputationreview") && words > 40) {
+            db.query("UPDATE members SET lorpoints=lorpoints+4, eventpoints=eventpoints+2 WHERE server = ? AND id = ? AND eventpoints IN (0,1,4,5)",
+                [message.channel.guild.id, message.author.id], function(err, result) {
+                if (result.changedRows > 0) {
+                    log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 4 lorpoints for review.");
+                    message.author.send("Congratulations, you earned 4 lorpoints for your review.");
+                }
+            });
+        }
+        if (message.content.includes("#reputationphoto") && message.attachments.size > 0) {
+            db.query("UPDATE members SET lorpoints=lorpoints+4, eventpoints=eventpoints+4 WHERE server = ? AND id = ? AND eventpoints IN (0,1,2,3)",
+                [message.channel.guild.id, message.author.id], function(err, result) {
+                    if (result.changedRows > 0) {
+                        log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 4 lorpoints for photo.");
+                        message.author.send("Congratulations, you earned 4 lorpoints for your photo.");
+                    }
+                });
+        }
     } else {
         db.query("INSERT INTO members (server, id, username, discriminator, lastseen) VALUES (?,?,?,?,UNIX_TIMESTAMP())" +
             "ON DUPLICATE KEY UPDATE username=?, discriminator=?, lastseen=UNIX_TIMESTAMP(), active=1",
@@ -1141,4 +1161,35 @@ function gammaCommand(message)
     let gamma = message.channel.guild.roles.find('name', 'gamma');
     message.member.addRole(gamma);
     message.reply("you have been added.");
+}
+
+const reputationTracklist = ["end game", "i did something bad", "dont blame me" , "delicate", "so it goes", "getaway car",
+    "king of my heart", "dancing with our hands tied", "dress", "this is why we cant have nice things", "new years day", "reputation album"];
+
+function reputationLorpoints()
+{
+    let guild = bot.guilds.get(config.mainServer);
+    let lhwb = bot.users.get("182878095919939584");
+    let currentSong = lhwb.presence.game.name.toLowerCase();
+    let red = bot.channels.get("125790296641503232");
+    if (reputationTracklist.indexOf(currentSong) !== -1) {
+        red.members.forEach(function(member, key, map) {
+            db.query("SELECT * FROM members WHERE server = ? AND id = ?", [config.mainServer, key], function(err, rows) {
+                if (rows[0] != null) {
+                    let minutes = rows[0].lastpoint;
+                    minutes++;
+                    db.query("UPDATE members SET lastpoint=? WHERE server = ? AND id = ?", [minutes, config.mainServer, key]);
+                    if (minutes >= 10) {
+                        db.query("UPDATE members SET lorpoints=lorpoints+5, eventpoints=eventpoints+1 WHERE server = ? AND id = ? AND eventpoints IN (0,2,4,6)",
+                            [config.mainServer, key], function(err, result) {
+                                if (result.changedRows > 0) {
+                                    log(guild,  member.user.username +  "#" + member.user.discriminator + " earned 5 lorpoints for bot listening.");
+                                    member.user.send("Congratulations, you earned 5 lorpoints for the bot event.");
+                                }
+                            });
+                    }
+                }
+            });
+        });
+    }
 }
