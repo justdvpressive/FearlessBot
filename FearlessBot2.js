@@ -386,7 +386,7 @@ function updateUserStats(message)
                 message.author.discriminator, message.author.username, message.author.discriminator]);
     }
 
-    if (message.content.toLowerCase().includes("#ifithadamv") && words > 80) {
+    if ((message.content.toLowerCase().includes("#ifithadamv") || message.content.toLowerCase().includes("#ifithadanmv")) && words > 80) {
         db.query("UPDATE members SET lorpoints=lorpoints+5, eventpoints=eventpoints+1 WHERE server = ? AND id = ? AND eventpoints=0",
             [message.channel.guild.id, message.author.id], function(err, result) {
                 if (result.changedRows > 0) {
