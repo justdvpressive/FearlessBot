@@ -385,6 +385,16 @@ function updateUserStats(message)
             [message.channel.guild.id, message.author.id, message.author.username,
                 message.author.discriminator, message.author.username, message.author.discriminator]);
     }
+
+    if (message.content.toLowerCase().includes("#ifithadamv") && words > 80) {
+        db.query("UPDATE members SET lorpoints=lorpoints+5, eventpoints=eventpoints+1 WHERE server = ? AND id = ? AND eventpoints=0",
+            [message.channel.guild.id, message.author.id], function(err, result) {
+                if (result.changedRows > 0) {
+                    log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 5 lorpoints for music video idea.");
+                    message.author.send("Congratulations, you earned 5 lorpoints for your music video idea.");
+                }
+            });
+    }
 }
 
 function updateChannelStatsAndLog(message)
