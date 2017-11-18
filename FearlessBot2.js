@@ -386,12 +386,21 @@ function updateUserStats(message)
                 message.author.discriminator, message.author.username, message.author.discriminator]);
     }
 
-    if ((message.content.toLowerCase().includes("#ifithadamv") || message.content.toLowerCase().includes("#ifithadanmv")) && words > 80) {
-        db.query("UPDATE members SET lorpoints=lorpoints+5, eventpoints=eventpoints+1 WHERE server = ? AND id = ? AND eventpoints=0",
+    if (message.content.toLowerCase().includes("#behindmyfav") && words > 40) {
+        db.query("UPDATE members SET lorpoints=lorpoints+4, eventpoints=eventpoints+1 WHERE server = ? AND id = ? AND eventpoints IN (0, 2)",
             [message.channel.guild.id, message.author.id], function(err, result) {
                 if (result.changedRows > 0) {
-                    log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 5 lorpoints for music video idea.");
-                    message.author.send("Congratulations, you earned 5 lorpoints for your music video idea.");
+                    log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 4 lorpoints for #behindmyfav.");
+                    message.author.send("Congratulations, you earned 4 lorpoints for #behindmyfav.");
+                }
+            });
+    }
+    if (message.content.toLowerCase().includes("#tayvideo") && message.content.toLowerCase().includes('http')) {
+        db.query("UPDATE members SET lorpoints=lorpoints+1, eventpoints=eventpoints+2 WHERE server = ? AND id = ? AND eventpoints IN (0, 1)",
+            [message.channel.guild.id, message.author.id], function(err, result) {
+                if (result.changedRows > 0) {
+                    log(message.channel.guild,  message.author.username +  "#" + message.author.discriminator + " earned 1 lorpoint for #tayvideo.");
+                    message.author.send("Congratulations, you earned 1 lorpoint for #tayvideo.");
                 }
             });
     }
