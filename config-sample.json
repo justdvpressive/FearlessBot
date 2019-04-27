@@ -1,14 +1,14 @@
 {
-  "token": "",
+  "token": "NTcxNDY4OTI4MTkxMTY4NTEz.XMP9WA.vGnCLysflWsQSJELk4rWJAVaq-g",
   "mysqlHost" : "",
   "mysqlUser" : "",
   "mysqlPass" : "",
   "mysqlDB" : "",
 
-  "mainServer" : "",
-  "statCountingChannels" : ["",""],
+  "mainServer" : "571420203716706305",
+  "statCountingChannels" : "571469278818205696",
   "noCommandChannels" : [""],
   "botAdminUserId" : "",
 
-  "baseUrl" : ""
+  "baseUrl" : "https://github.com/justdvpressive"
 }
