@@ -5,6 +5,9 @@
     "discord.js": "*",
     "mysql": "*"
   },
+  "engines": {
+    "node": "9.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/EnchantedLuna/FearlessBot.git"
